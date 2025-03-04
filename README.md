@@ -17,13 +17,13 @@ This project deploys a WordPress application with a MySQL database on Amazon EKS
 The architecture leverages Kubernetes resources on EKS:
 
 1. **MySQL**:
-   - **StatefulSet**: `mysql` with 1 replica ensures stable identity and persistent storage.
+   - **StatefulSet**: `mysql` with 2 replica ensures stable identity and persistent storage.
    - **PVC**: `mysql-storage-mysql-0` uses `itai-ebs-sc` StorageClass (2Gi, EBS gp3 volume) mounted at `/var/lib/mysql`.
    - **Secrets**: MySQL credentials (root password and user password) are sourced from the `mysql-secrets` Secret, enhancing security by avoiding plaintext in the YAML.
    - **Service**: Headless (`ClusterIP: None`) at `mysql.itai-ns.svc.cluster.local:3306` for direct pod access.
 
 2. **WordPress**:
-   - **Deployment**: `wordpress` with 1 replica for stateless web serving.
+   - **Deployment**: `wordpress` with 2 replica for stateless web serving.
    - **Storage**: Uses `emptyDir` (ephemeral storage) at `/var/www/html`—data persists in MySQL.
    - **Service**: `wordpress` (ClusterIP) exposes port 80.
 
