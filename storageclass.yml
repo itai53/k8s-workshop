@@ -1,0 +1,12 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: itai-ebs-sc  
+provisioner: ebs.csi.aws.com  
+parameters:
+  type: gp3  
+  fsType: ext4
+  encrypted: "true"  
+volumeBindingMode: WaitForFirstConsumer  # Binds with a pod 
+allowVolumeExpansion: true  
+reclaimPolicy: Delete  # Deletes the volume when PVC is deleted 

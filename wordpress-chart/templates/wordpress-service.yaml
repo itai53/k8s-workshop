@@ -1,0 +1,13 @@
+# wordpress-chart/templates/wordpress-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: wordpress
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP

@@ -1,0 +1,61 @@
+# wordpress-chart/values.yaml
+namespace: itai-ns
+
+mysql:
+  image:
+    repository: 992382545251.dkr.ecr.us-east-1.amazonaws.com/itai-k8s-app
+    tag: mysql-8.0
+  database: wordpress
+  user: wordpress
+  storage:
+    size: 2Gi
+    storageClassName: itai-ebs-sc
+
+wordpress:
+  image:
+    repository: 992382545251.dkr.ecr.us-east-1.amazonaws.com/itai-k8s-app
+    tag: wordpress
+  imagePullPolicy: Always
+  env:
+    dbHost: "mysql"
+    dbUser: "wordpress"
+    dbPasswordSecret: mysql-secrets
+    dbPasswordKey: mysql-user-password
+    dbName: "wordpress"
+
+ingress:
+  enabled: true
+  className: itai-ns
+  host: "acbd11eb2481445e986dfb02fde514d7-602718039.us-east-1.elb.amazonaws.com"
+  annotations:
+    sslRedirect: "false"
+    useRegex: "true"
+    proxyReadTimeout: "3600"
+    proxySendTimeout: "3600"
+  grafanaService: wordpress-chart-kube-prom-stack-grafana  
+
+storageClass:
+  name: itai-ebs-sc
+  provisioner: ebs.csi.aws.com
+  parameters:
+    type: gp3
+    fsType: ext4
+    encrypted: "true"
+  volumeBindingMode: WaitForFirstConsumer
+  allowVolumeExpansion: true
+  reclaimPolicy: Delete
+
+imagePullSecrets:
+  ecrSecretName: ecr-secret
+  server: "992382545251.dkr.ecr.us-east-1.amazonaws.com"
+  username: "AWS"
+
+# Kube Prometheus Stack Configuration
+kube-prometheus-stack:
+  grafana:
+    service:
+      type: ClusterIP
+  prometheus:
+    service:
+      type: ClusterIP
+ 

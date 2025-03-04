@@ -1,0 +1,42 @@
+# wordpress-chart/templates/wordpress-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+      - name: wordpress
+        image: {{ .Values.wordpress.image.repository }}:{{ .Values.wordpress.image.tag }}
+        imagePullPolicy: {{ .Values.wordpress.imagePullPolicy }}
+        env:
+        - name: WORDPRESS_DB_HOST
+          value: {{ .Values.wordpress.env.dbHost }}
+        - name: WORDPRESS_DB_USER
+          value: {{ .Values.wordpress.env.dbUser }}
+        - name: WORDPRESS_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.wordpress.env.dbPasswordSecret }}
+              key: {{ .Values.wordpress.env.dbPasswordKey }}
+        - name: WORDPRESS_DB_NAME
+          value: {{ .Values.wordpress.env.dbName }}
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /var/www/html
+          name: wordpress-storage
+      volumes:
+      - name: wordpress-storage
+        emptyDir: {}
+      imagePullSecrets:
+      - name: {{ .Values.imagePullSecrets.ecrSecretName }}

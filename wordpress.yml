@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:  
+  name: wordpress
+  namespace: itai-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+      - name: wordpress
+        image: 992382545251.dkr.ecr.us-east-1.amazonaws.com/itai-k8s-app:wordpress
+        imagePullPolicy: Always 
+        env:
+        - name: WORDPRESS_DB_HOST
+          value: "mysql"
+        - name: WORDPRESS_DB_USER
+          value: "wordpress"
+        - name: WORDPRESS_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secrets
+              key: mysql-user-password
+        - name: WORDPRESS_DB_NAME
+          value: "wordpress"
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /var/www/html
+          name: wordpress-storage
+      volumes:
+      - name: wordpress-storage
+        emptyDir: {}
+      imagePullSecrets:
+      - name: ecr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+  namespace: itai-ns
+spec:
+  selector:
+    app: wordpress
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
