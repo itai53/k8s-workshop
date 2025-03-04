@@ -158,3 +158,10 @@ kubectl get svc wordpress -n itai-ns
 ```
 
 Access WordPress at `http://<wordpress-alb-url>`.
+
+
+pic of wordpress connection:
+![alt text](k8s_1.png)
+
+pic of grafana dashboard:
+![alt text](k8s_2.png)
